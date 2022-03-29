@@ -36,26 +36,26 @@ Los ambientes del proyecto son:
 
 ## Instalación manual
 
-# clonar repositorio
+### Clonar repositorio
     git clone https://github.com/marcotorres/sburk.git
 
-# crear .env files
+### Crear .env files
     cp .env.example .env
     cp ./src/.env.example ./src/.env
 
-# levantar contenedores
+### Levantar contenedores
     docker-compose up -d
 
-# downgrade a composer
+### Downgrade a composer
     docker exec -t sburk sh -c "composer self-update 1.10.22"
 
-# instalar dependencias (vendor)
+### Instalar dependencias (vendor)
     docker exec -t sburk sh -c "composer install"
 
-# instalar dependencias nodejs
+### Instalar dependencias nodejs
     docker run -ti --rm -v ${PWD}/src:/app -w /app node:latest sh -c "npm i"
 
-# configurar usuario de mysql
+### Configurar usuario de mysql
     make cli_db
     docker exec -ti mysql sh
     mysql -u root -pexito    
@@ -64,7 +64,7 @@ Los ambientes del proyecto son:
     GRANT ALL PRIVILEGES ON schoolbustracker_db.* TO usr_sburk@'%';
     FLUSH PRIVILEGES;
 
-# configurar laravel
+### Configurar Laravel
     make cli    
     docker exec -ti sburk sh    
     php artisan key:generate
