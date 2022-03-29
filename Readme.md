@@ -33,3 +33,43 @@ basico como:
 Los ambientes del proyecto son:
 
 - Local: http://sburk.localhost
+
+## Instalación manual
+
+# clonar repositorio
+    git clone https://github.com/marcotorres/sburk.git
+
+# crear .env files
+    cp .env.example .env
+    cp ./src/.env.example ./src/.env
+
+# levantar contenedores
+    docker-compose up -d
+
+# downgrade a composer
+    docker exec -t sburk sh -c "composer self-update 1.10.22"
+
+# instalar dependencias (vendor)
+    docker exec -t sburk sh -c "composer install"
+
+# instalar dependencias nodejs
+    docker run -ti --rm -v ${PWD}/src:/app -w /app node:latest sh -c "npm i"
+
+# configurar usuario de mysql
+    make cli_db
+    docker exec -ti mysql sh
+    mysql -u root -pexito    
+    DROP USER usr_sburk@'%';
+    CREATE USER usr_sburk@'%' IDENTIFIED WITH mysql_native_password BY 'exito';
+    GRANT ALL PRIVILEGES ON schoolbustracker_db.* TO usr_sburk@'%';
+    FLUSH PRIVILEGES;
+
+# configurar laravel
+    make cli    
+    docker exec -ti sburk sh    
+    php artisan key:generate
+    php artisan migrate
+    php artisan db:seed
+    php artisan cache:clear
+    php artisan config:clear
+    php artisan view:clear
