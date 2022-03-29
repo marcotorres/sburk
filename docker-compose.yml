@@ -1,0 +1,63 @@
+version: '3.8'
+services:
+  nginx-proxy:
+    image: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ${PWD}/docker/nginx/ssl:/etc/nginx/ssl
+      - ${PWD}/docker/nginx/conf.d:/etc/nginx/conf.d
+      - ${PWD}/docker/nginx/nginxapi.conf:/etc/nginx/nginx.conf
+    networks:
+      - sburk_vlan
+
+  sburk:
+    image: webdevops/php-nginx:7.2
+    container_name: sburk
+    working_dir: /app
+    restart: always
+    expose:
+      - "80"
+    volumes:
+      - ${PWD}/src:/app:rw
+      - ${PWD}/docker/nginx/nginxapi.conf:/etc/nginx/nginx.conf
+    environment:
+      - WEB_DOCUMENT_ROOT=/app/public
+      - VIRTUAL_HOST=sburk.localhost
+    networks:
+      - sburk_vlan
+
+  mysql:
+    image: mysql:8.0.25
+    container_name: mysql
+    restart: on-failure
+    volumes:
+      - ${PWD}/data:/app:rw
+      - sburk_data_mysql:/var/lib/mysql
+    working_dir: /app
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_USER: ${MYSQL_USER_NAME}
+      MYSQL_PASSWORD: ${MYSQL_USER_PWD}
+    ports:
+      - "3306:3306"
+    networks:
+      - sburk_vlan
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - sburk_vlan
+
+networks:
+  sburk_vlan:
+
+volumes:
+  sburk_data_mysql:
